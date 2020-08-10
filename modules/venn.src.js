@@ -1,5 +1,5 @@
 /**
- * @license Highcharts JS v8.1.2 (2020-06-16)
+ * @license Highcharts JS v8.1.2 (2020-08-10)
  *
  * (c) 2017-2019 Highsoft AS
  * Authors: Jon Arild Nygard
@@ -103,8 +103,13 @@
             // Call draw to render component
             draw.call(point, params);
         };
+        var drawPointModule = {
+                draw: draw,
+                drawPoint: drawPoint,
+                isFn: isFn
+            };
 
-        return drawPoint;
+        return drawPointModule;
     });
     _registerModule(_modules, 'mixins/geometry.js', [], function () {
         /* *
@@ -676,7 +681,7 @@
 
         return content;
     });
-    _registerModule(_modules, 'modules/venn.src.js', [_modules['parts/Color.js'], _modules['parts/Globals.js'], _modules['parts/Utilities.js'], _modules['mixins/draw-point.js'], _modules['mixins/geometry.js'], _modules['mixins/geometry-circles.js'], _modules['mixins/nelder-mead.js']], function (Color, H, U, draw, geometry, geometryCirclesModule, nelderMeadModule) {
+    _registerModule(_modules, 'Series/VennSeries.js', [_modules['Core/Color.js'], _modules['Core/Globals.js'], _modules['Core/Utilities.js'], _modules['mixins/draw-point.js'], _modules['mixins/geometry.js'], _modules['mixins/geometry-circles.js'], _modules['mixins/nelder-mead.js']], function (Color, H, U, drawPointModule, geometry, geometryCirclesModule, nelderMeadModule) {
         /* *
          *
          *  Experimental Highcharts module which enables visualization of a Venn
@@ -703,6 +708,7 @@
             isString = U.isString,
             merge = U.merge,
             seriesType = U.seriesType;
+        var draw = drawPointModule.draw;
         var getAreaOfCircle = geometryCirclesModule.getAreaOfCircle,
             getAreaOfIntersectionBetweenCircles = geometryCirclesModule.getAreaOfIntersectionBetweenCircles,
             getCircleCircleIntersection = geometryCirclesModule.getCircleCircleIntersection,

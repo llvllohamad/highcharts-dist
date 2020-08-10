@@ -1,5 +1,5 @@
 /**
- * @license Highcharts JS v8.1.2 (2020-06-16)
+ * @license Highcharts JS v8.1.2 (2020-08-10)
  * @module highcharts/themes/grid
  * @requires highcharts
  *
@@ -8,4 +8,4 @@
  * License: www.highcharts.com/license
  */
 'use strict';
-import '../../themes/grid.js';
+import '../../Extensions/Themes/Grid.js';

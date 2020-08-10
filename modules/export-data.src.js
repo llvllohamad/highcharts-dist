@@ -1,5 +1,5 @@
 /**
- * @license Highcharts JS v8.1.2 (2020-06-16)
+ * @license Highcharts JS v8.1.2 (2020-08-10)
  *
  * Exporting module
  *
@@ -28,7 +28,7 @@
             obj[path] = fn.apply(null, args);
         }
     }
-    _registerModule(_modules, 'mixins/ajax.js', [_modules['parts/Globals.js'], _modules['parts/Utilities.js']], function (H, U) {
+    _registerModule(_modules, 'mixins/ajax.js', [_modules['Core/Globals.js'], _modules['Core/Utilities.js']], function (H, U) {
         /* *
          *
          *  (c) 2010-2017 Christer Vasseng, Torstein Honsi
@@ -175,9 +175,14 @@
                 }
             });
         };
+        var ajaxModule = {
+                ajax: H.ajax,
+                getJSON: H.getJSON
+            };
 
+        return ajaxModule;
     });
-    _registerModule(_modules, 'mixins/download-url.js', [_modules['parts/Globals.js']], function (Highcharts) {
+    _registerModule(_modules, 'mixins/download-url.js', [_modules['Core/Globals.js']], function (Highcharts) {
         /* *
          *
          *  (c) 2015-2020 Oystein Moseng
@@ -203,8 +208,8 @@
          * @return {string|undefined}
          *         Blob
          */
-        Highcharts.dataURLtoBlob = function (dataURL) {
-            var parts = dataURL.match(/data:([^;]*)(;base64)?,([0-9A-Za-z+/]+)/);
+        var dataURLtoBlob = Highcharts.dataURLtoBlob = function (dataURL) {
+                var parts = dataURL.match(/data:([^;]*)(;base64)?,([0-9A-Za-z+/]+)/);
             if (parts &&
                 parts.length > 3 &&
                 win.atob &&
@@ -235,9 +240,10 @@
          *        The name of the resulting file (w/extension)
          * @return {void}
          */
-        Highcharts.downloadURL = function (dataURL, filename) {
-            var a = doc.createElement('a'),
-                windowRef;
+        var downloadURL = Highcharts.downloadURL = function (dataURL,
+            filename) {
+                var a = doc.createElement('a'),
+            windowRef;
             // IE specific blob implementation
             // Don't use for normal dataURLs
             if (typeof dataURL !== 'string' &&
@@ -249,7 +255,7 @@
             // Some browsers have limitations for data URL lengths. Try to convert to
             // Blob or fall back. Edge always needs that blob.
             if (isEdgeBrowser || dataURL.length > 2000000) {
-                dataURL = Highcharts.dataURLtoBlob(dataURL);
+                dataURL = dataURLtoBlob(dataURL);
                 if (!dataURL) {
                     throw new Error('Failed to convert to blob');
                 }
@@ -276,9 +282,14 @@
                 }
             }
         };
+        var downladURLmodule = {
+                dataURLtoBlob: dataURLtoBlob,
+                downloadURL: downloadURL
+            };
 
+        return downladURLmodule;
     });
-    _registerModule(_modules, 'modules/export-data.src.js', [_modules['parts/Axis.js'], _modules['parts/Chart.js'], _modules['parts/Globals.js'], _modules['parts/Utilities.js']], function (Axis, Chart, H, U) {
+    _registerModule(_modules, 'Extensions/ExportData.js', [_modules['Core/Axis/Axis.js'], _modules['Core/Chart/Chart.js'], _modules['Core/Globals.js'], _modules['Core/Utilities.js'], _modules['mixins/download-url.js']], function (Axis, Chart, H, U, downloadURLmodule) {
         /* *
          *
          *  Experimental data export module for Highcharts
@@ -328,7 +339,7 @@
         * @name Highcharts.ExportDataEventObject#dataRows
         * @type {Array<Array<string>>}
         */
-        var downloadURL = H.downloadURL;
+        var downloadURL = downloadURLmodule.downloadURL;
         // Can we add this to utils? Also used in screen-reader.js
         /**
          * HTML encode some characters vulnerable for XSS.
@@ -666,7 +677,9 @@
             // Create point array depends if xAxis is category
             // or point.name is defined #13293
             getPointArray = function (series, xAxis) {
-                var namedPoints = series.data.filter(function (d) { return d.name; });
+                var namedPoints = series.data.filter(function (d) {
+                        return (typeof d.y !== 'undefined') && d.name;
+                });
                 if (namedPoints.length &&
                     xAxis &&
                     !xAxis.categories &&

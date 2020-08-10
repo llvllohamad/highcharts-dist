@@ -1,5 +1,5 @@
 /**
- * @license Highcharts JS v8.1.2 (2020-06-16)
+ * @license Highcharts JS v8.1.2 (2020-08-10)
  *
  * (c) 2016-2019 Highsoft AS
  * Authors: Jon Arild Nygard
@@ -103,10 +103,15 @@
             // Call draw to render component
             draw.call(point, params);
         };
+        var drawPointModule = {
+                draw: draw,
+                drawPoint: drawPoint,
+                isFn: isFn
+            };
 
-        return drawPoint;
+        return drawPointModule;
     });
-    _registerModule(_modules, 'mixins/polygon.js', [_modules['parts/Globals.js'], _modules['parts/Utilities.js']], function (H, U) {
+    _registerModule(_modules, 'mixins/polygon.js', [_modules['Core/Globals.js'], _modules['Core/Utilities.js']], function (H, U) {
         /* *
          *
          *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
@@ -428,7 +433,7 @@
 
         return collision;
     });
-    _registerModule(_modules, 'modules/wordcloud.src.js', [_modules['parts/Globals.js'], _modules['parts/Utilities.js'], _modules['mixins/draw-point.js'], _modules['mixins/polygon.js']], function (H, U, drawPoint, polygon) {
+    _registerModule(_modules, 'Series/WordcloudSeries.js', [_modules['Core/Globals.js'], _modules['Core/Utilities.js'], _modules['mixins/draw-point.js'], _modules['mixins/polygon.js']], function (H, U, drawPointModule, polygon) {
         /* *
          *
          *  Experimental Highcharts module which enables visualization of a word cloud.
@@ -447,6 +452,7 @@
             isObject = U.isObject,
             merge = U.merge,
             seriesType = U.seriesType;
+        var drawPoint = drawPointModule.drawPoint;
         var noop = H.noop,
             getBoundingBoxFromPolygon = polygon.getBoundingBoxFromPolygon,
             getPolygon = polygon.getPolygon,
